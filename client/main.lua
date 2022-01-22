@@ -1,10 +1,11 @@
 local cam = nil
 local charPed = nil
 local QBCore = exports['qb-core']:GetCoreObject()
+local pedscreated = {}
 
 -- Main Thread
 
-CreateThread(function()
+--[[CreateThread(function()
 	while true do
 		Wait(0)
 		if NetworkIsSessionStarted() then
@@ -12,6 +13,13 @@ CreateThread(function()
 			return
 		end
 	end
+end)]]
+
+CreateThread(function ()
+    while not NetworkIsSessionStarted() do
+        Wait(100)
+    end
+    TriggerEvent('qb-multicharacter:client:chooseChar')
 end)
 
 -- Functions
@@ -112,6 +120,10 @@ RegisterNUICallback('cDataPed', function(data)
     local cData = data.cData  
     SetEntityAsMissionEntity(charPed, true, true)
     DeleteEntity(charPed)
+    for k, v in pairs(pedscreated) do
+        DeleteEntity(v)
+        table.remove(pedscreated, k)
+    end
     if cData ~= nil then
         QBCore.Functions.TriggerCallback('qb-multicharacter:server:getSkin', function(model, data)
             model = model ~= nil and tonumber(model) or false
@@ -119,9 +131,10 @@ RegisterNUICallback('cDataPed', function(data)
                 CreateThread(function()
                     RequestModel(model)
                     while not HasModelLoaded(model) do
-                        Wait(0)
+                        Wait(100)
                     end
                     charPed = CreatePed(2, model, Config.PedCoords.x, Config.PedCoords.y, Config.PedCoords.z - 0.98, Config.PedCoords.w, false, true)
+                    table.insert(pedscreated, charped)
                     SetPedComponentVariation(charPed, 0, 0, 0, 2)
                     FreezeEntityPosition(charPed, false)
                     SetEntityInvincible(charPed, true)
@@ -139,9 +152,10 @@ RegisterNUICallback('cDataPed', function(data)
                     local model = GetHashKey(randommodels[math.random(1, #randommodels)])
                     RequestModel(model)
                     while not HasModelLoaded(model) do
-                        Wait(0)
+                        Wait(100)
                     end
                     charPed = CreatePed(2, model, Config.PedCoords.x, Config.PedCoords.y, Config.PedCoords.z - 0.98, Config.PedCoords.w, false, true)
+                    table.insert(pedscreated, charped)
                     SetPedComponentVariation(charPed, 0, 0, 0, 2)
                     FreezeEntityPosition(charPed, false)
                     SetEntityInvincible(charPed, true)
@@ -159,9 +173,10 @@ RegisterNUICallback('cDataPed', function(data)
             local model = GetHashKey(randommodels[math.random(1, #randommodels)])
             RequestModel(model)
             while not HasModelLoaded(model) do
-                Wait(0)
+                Wait(100)
             end
             charPed = CreatePed(2, model, Config.PedCoords.x, Config.PedCoords.y, Config.PedCoords.z - 0.98, Config.PedCoords.w, false, true)
+            table.insert(pedscreated, charped)
             SetPedComponentVariation(charPed, 0, 0, 0, 2)
             FreezeEntityPosition(charPed, false)
             SetEntityInvincible(charPed, true)
