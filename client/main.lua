@@ -4,7 +4,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 -- Main Thread
 
-CreateThread(function()
+--[[CreateThread(function()
 	while true do
 		Wait(0)
 		if NetworkIsSessionStarted() then
@@ -12,6 +12,13 @@ CreateThread(function()
 			return
 		end
 	end
+end)]]
+
+CreateThread(function ()
+    while not NetworkIsSessionStarted() do
+        Wait(100)
+    end
+    TriggerEvent('qb-multicharacter:client:chooseChar')
 end)
 
 -- Functions
